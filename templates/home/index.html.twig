@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ParkingDetailController!{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1 class="text-warning text-center">Checkpoint system!!</h1>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        New parking ticket
+    </button>
+  
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#close">
+        Close ticket
+    </button>
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myTicket">
+        Find my parking records
+    </button>
+   <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">New parking entry</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{{ path('parking_entry')}}" method="POST">
+              <div class="mb-3">
+                <label for="license_number" class="form-label">Driver License number</label>
+                <input type="text" name="license_number" class="form-control" id="license_number">
+              </div>
+              <div class="mb-3">
+                <label for="plate_number" class="form-label">car number</label>
+                <input type="text" name="plate_number" class="form-control" id="plate_number">
+              </div>
+              <div class="mb-3">
+                <label for="car_type" class="form-label">car type</label>
+                <input type="text" name="car_type" class="form-control" id="car_type">
+              </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal fade" id="close" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Close ticket</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{{ path('parking_exit')}}" method="POST">
+            <div class="mb-3">
+                <label for="ticket_no" class="form-label">ticket number</label>
+                <input type="text" name="ticket_no" class="form-control" id="ticket_no" aria-describedby="ticket number">
+              </div>
+            
+            <button type="submit" class="btn btn-primary">Close ticket</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="myTicket" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Close ticket</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{{ path('parking_details')}}" method="POST">
+            <div class="mb-3">
+                <label for="license_number" class="form-label">License number</label>
+                <input type="text" name="license_number" class="form-control" id="license_number" aria-describedby="license number">
+              </div>
+            
+            <button type="submit" class="btn btn-primary">Find</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+      
+
+    <table class="table table-hover my-5">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Plate number</th>
+            <th scope="col">Ticket number</th>
+            <th scope="col">Entry time</th>
+            <th scope="col">Exit time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for record in records %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ record.getPlateNo }}</td>
+            <td>{{ record.getTicket }}</td>
+            <td>{{ record.getEntryAt|date('Y-m-d h:i:s') }}</td>
+            <td>{% if record.getExitAt %}
+                    {{ record.getExitAt|date('Y-m-d h:i:s') }}
+                 {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+</div>
+{% endblock %}
