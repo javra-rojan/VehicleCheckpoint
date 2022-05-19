@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Controller;
-
 use App\Entity\Driver;
 use App\Entity\ParkingDetail;
 use App\Repository\DriverRepository;
