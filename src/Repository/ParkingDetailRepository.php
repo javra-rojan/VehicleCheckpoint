@@ -4,6 +4,10 @@ namespace App\Repository;
 
 use App\Entity\ParkingDetail;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\AST\Join;
+use Doctrine\ORM\Query\AST\WhereClause;
+use Doctrine\ORM\Query\Expr;
+
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -37,6 +41,39 @@ class ParkingDetailRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+    public function search($request){
+        $qb = $this->createQueryBuilder('p');
+        $qb->select('p')
+            ->innerJoin('App\Entity\Driver', 'd', Expr\Join::WITH , 'd=p.driver');
+            
+        $parameters = [];
+        $license_no = $request->query->get('license_number');
+        $plate_no = $request->query->get('plate_number'); 
+
+        if(!empty($plate_no) && !empty($license_no)){
+            // dd('both');
+            $qb->where('p.PlateNo like :plate')
+                ->andWhere('d.license_no = :license');
+            $parameters['plate'] = $request->query->get('plate_number');
+            $parameters['license'] = $request->query->get('license_number');
+        }
+        elseif(  empty($plate_no) && !empty($license_no) ){
+            $qb->where('d.license_no = :license');
+            $parameters['license'] = $request->query->get('license_number');
+        }
+
+        elseif( !empty($plate_no) && empty($license_no)){
+            $qb->where('p.PlateNo like :plate');
+            
+            $parameters['plate'] = $request->query->get('plate_number');
+        }
+       
+        if (count($parameters)) {
+            $qb->setParameters($parameters);
+        }
+        return $qb->getQuery()->getResult();
+
     }
 
 //    /**

@@ -22,6 +22,18 @@
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myTicket">
         Find my parking records
     </button>
+    
+    <form class="my-5" action="{{ path('search_query')}}" method="GET">
+      <div class="mb-3">
+        <label for="license_number" class="form-label">License number</label>
+        <input type="text" name="license_number" class="form-control" id="license_number" aria-describedby="license number">
+      </div>
+      <div class="mb-3">
+        <label for="plate_number" class="form-label">Plate number</label>
+        <input type="text" name="plate_number" class="form-control" id="plate_number">
+      </div>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
    <!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -37,7 +49,7 @@
                 <input type="text" name="license_number" class="form-control" id="license_number">
               </div>
               <div class="mb-3">
-                <label for="plate_number" class="form-label">car number</label>
+                <label for="plate_number" class="form-label">Plate number</label>
                 <input type="text" name="plate_number" class="form-control" id="plate_number">
               </div>
               <div class="mb-3">
