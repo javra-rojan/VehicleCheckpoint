@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ParkingDetail;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\WhereClause;
@@ -44,36 +45,42 @@ class ParkingDetailRepository extends ServiceEntityRepository
     }
     public function search($request){
         $qb = $this->createQueryBuilder('p');
-        $qb->select('p')
-            ->innerJoin('App\Entity\Driver', 'd', Expr\Join::WITH , 'd=p.driver');
-            
+        $result = $qb->select('p')
+            ->innerJoin('App\Entity\Driver', 'd', Expr\Join::WITH , 'd=p.driver');   
         $parameters = [];
         $license_no = $request->query->get('license_number');
         $plate_no = $request->query->get('plate_number'); 
-
-        if(!empty($plate_no) && !empty($license_no)){
-            // dd('both');
-            $qb->where('p.PlateNo like :plate')
-                ->andWhere('d.license_no = :license');
-            $parameters['plate'] = $request->query->get('plate_number');
-            $parameters['license'] = $request->query->get('license_number');
+        $date = $request->query->get('date');
+        // dd($date);
+        // $fn = 'where';
+        if( !empty($license_no) ){
+            $qb->andWhere('d.license_no = :license_no');
+            $parameters['license_no'] = $license_no;
+            // $fn = 'andWhere';
         }
-        elseif(  empty($plate_no) && !empty($license_no) ){
-            $qb->where('d.license_no = :license');
-            $parameters['license'] = $request->query->get('license_number');
+        if( !empty($plate_no) ){
+            $qb->andWhere('p.PlateNo like :plate');
+            $parameters['plate'] = $plate_no;
+            // $fn = 'andWhere';  
         }
-
-        elseif( !empty($plate_no) && empty($license_no)){
-            $qb->where('p.PlateNo like :plate');
-            
-            $parameters['plate'] = $request->query->get('plate_number');
+        if( !empty($date)){
+            $date = new DateTime($date);
+            $qb->andWhere('p.EntryAt between :from AND :to');
+            $parameters['from'] = $date->format('Y-m-d 00:00:00');
+            $parameters['to'] = $date->format('Y-m-d 23:59:59');
         }
-       
         if (count($parameters)) {
             $qb->setParameters($parameters);
         }
         return $qb->getQuery()->getResult();
-
+    }
+    public function searchByDate($date){
+        $from = $date->format('Y-m-d 00:00:00');
+        $to =  $date->format('Y-m-d 23:59:59');
+        $qb = $this->createQueryBuilder('p');
+        $qb->where('p.EntryAt between :from AND :to')
+            ->setParameter('from', $from)->setParameter('to', $to);
+        return $qb->getQuery()->getResult();
     }
 
 //    /**
